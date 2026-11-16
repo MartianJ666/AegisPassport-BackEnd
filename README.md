@@ -25,7 +25,33 @@ Windows 使用 `gradlew.bat bootRun`。
 
 默认启用 `local` profile，监听 `8421`，允许前端从 `http://localhost:8420` 访问。开发环境使用内存 H2 和内存缓存，不要求运行 MySQL 或 Redis；进程停止后，开发数据库中的数据会丢失。
 
-空数据库启动时会创建 `admin` 管理员。若未设置 `BOOTSTRAP_ADMIN_PASSWORD`，程序会生成随机密码并在初始化日志中显示；也可以在启动前通过环境变量指定。初始化配置不会覆盖已有管理员的密码。
+### 管理员初始账号
+
+| 项目 | 默认值 |
+| --- | --- |
+| 用户名 | `admin` |
+| 初始密码 | 首次初始化时随机生成的 20 位密码 |
+| 密码位置 | 后端启动日志中的 `password:` 一行，仅在生成时显示一次 |
+
+使用容器部署时，运行 `docker logs server` 查看初始化日志。项目没有统一的固定默认密码。
+
+也可以在首次启动前指定管理员账号和密码。将下面的 `replace-with-your-own-password` 换成自己的初始密码：
+
+```sh
+BOOTSTRAP_ADMIN_USERNAME=admin \
+BOOTSTRAP_ADMIN_PASSWORD='replace-with-your-own-password' \
+./gradlew bootRun
+```
+
+Windows PowerShell：
+
+```powershell
+$env:BOOTSTRAP_ADMIN_USERNAME = 'admin'
+$env:BOOTSTRAP_ADMIN_PASSWORD = 'replace-with-your-own-password'
+.\gradlew.bat bootRun
+```
+
+已有管理员时，初始化配置不会重新创建账号或覆盖密码。`local` profile 的内存数据库在进程停止后会丢失，因此下次启动会重新初始化管理员；使用随机密码时，需要重新查看当次日志。
 
 未设置 `JWT_SECRET` 的开发实例会生成临时签名密钥，重启后需要重新登录。
 
