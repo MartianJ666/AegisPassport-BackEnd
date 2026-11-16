@@ -1,0 +1,91 @@
+# AegisPassport — shared configuration (see application-{profile}.yaml for env specifics)
+spring:
+  application:
+    name: AegisPassport
+  profiles:
+    default: local
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 12MB
+      max-request-size: 12MB
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  data:
+    redis:
+      connect-timeout: 500ms
+      timeout: 500ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+server:
+  port: ${SERVER_PORT:8421}
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      cookie:
+        # Host-only session cookies are retained on the authorization-server origin.
+        name: __Host-passport-session
+        path: /
+        http-only: true
+        same-site: lax
+        secure: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    root: INFO
+    io.aegis.passport: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+
+passport:
+  # Public issuer URL of this authorization server.
+  issuer: ${OAUTH2_ISSUER:http://localhost:8421}
+  # SPA origin allowed for CORS and OAuth redirects to login/consent.
+  frontend-url: ${FRONTEND_URL:http://localhost:8420}
+  cors-allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8420}
+  jwt:
+    secret: ${JWT_SECRET:}
+    # API access token lifetime (ms). Default 7 days.
+    expiration-ms: ${JWT_EXPIRATION:604800000}
+  security:
+    login:
+      max-attempts: 5
+      lock-seconds: 300
+  # Self-service sign-up. When false, anonymous /api/auth/register calls and the
+  # first-login auto-creation of accounts from third-party providers are refused.
+  # Admin-initiated account creation is never affected.
+  registration:
+    self-service-enabled: ${REGISTRATION_SELF_SERVICE_ENABLED:true}
+  # OAuth consent page origin (the SPA may be served from sso.*). Blank falls
+  # back to frontend-url.
+  consent:
+    base-url: ${CONSENT_BASE_URL:}
+  third-party:
+    # Dedicated 32-byte Base64 AES key for provider App Keys and OAuth client secrets.
+    # Never expose this value through an API.
+    config-envelope-key: ${THIRD_PARTY_CONFIG_ENVELOPE_KEY:}
+  upload:
+    dir: ${UPLOAD_DIR:uploads}
+    url-prefix: /uploads
+  # Bootstrap admin: created on first start only if no admin user exists.
+  bootstrap-admin:
+    username: ${BOOTSTRAP_ADMIN_USERNAME:admin}
+    # If blank, a random password is generated and logged once at startup.
+    password: ${BOOTSTRAP_ADMIN_PASSWORD:}

@@ -1,0 +1,17 @@
+# The image copies the host-built fat jar from build/libs. Exclude everything
+# else under build/ and the Gradle caches to keep the context small.
+.gradle
+.gradle-verification
+build/*
+!build/libs
+build/libs/*
+!build/libs/AegisPassport-BackEnd-*.jar
+logs
+uploads
+*.log
+.git
+.idea
+*.iml
+.DS_Store
+Dockerfile
+.dockerignore

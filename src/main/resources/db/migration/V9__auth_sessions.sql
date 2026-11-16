@@ -1,0 +1,20 @@
+CREATE TABLE auth_sessions (
+    id              CHAR(36)      NOT NULL,
+    user_id         BIGINT        NOT NULL,
+    device_hash     CHAR(64)      NOT NULL,
+    device_label    VARCHAR(160)  NOT NULL,
+    ip_address      VARCHAR(64)   NULL,
+    user_agent      VARCHAR(500)  NULL,
+    auth_method     VARCHAR(32)   NOT NULL,
+    created_at      DATETIME(6)   NOT NULL,
+    last_seen_at    DATETIME(6)   NOT NULL,
+    expires_at      DATETIME(6)   NOT NULL,
+    revoked_at      DATETIME(6)   NULL,
+    revoked_reason  VARCHAR(100)  NULL,
+    revoked_by      VARCHAR(100)  NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_auth_sessions_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_auth_sessions_user_active (user_id, revoked_at, expires_at),
+    INDEX idx_auth_sessions_last_seen (last_seen_at),
+    INDEX idx_auth_sessions_device (user_id, device_hash)
+);

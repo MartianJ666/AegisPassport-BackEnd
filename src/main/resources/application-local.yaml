@@ -1,0 +1,28 @@
+# Local dev profile — H2 in-memory DB + embedded-friendly defaults.
+# Redis is optional locally; caching falls back to a simple in-memory cache.
+spring:
+  datasource:
+    url: jdbc:h2:mem:passport;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+  flyway:
+    # The disposable H2 development database uses the JPA model.
+    # MySQL deployments apply the versioned Flyway migrations.
+    enabled: false
+  h2:
+    console:
+      enabled: true
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+
+passport:
+  cache:
+    # 'redis' in docker, 'memory' locally so you don't need Redis running.
+    provider: ${CACHE_PROVIDER:memory}
